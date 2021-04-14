@@ -20,7 +20,6 @@
 #ifndef GEMINI_GEMINICLIENT
 #define GEMINI_GEMINICLIENT
 
-#include "TslConnection.hpp"
 #include "Socket.hpp"
 
 #include <memory>
@@ -44,14 +43,10 @@ namespace gemini {
     };
 
     class GeminiClient {
-        public:
-            GeminiClient(std::unique_ptr<Socket> socket);
-            ~GeminiClient();
-            static std::unique_ptr<GeminiClient> getGeminiClient();
-            Response request(const std::string hostname, const std::string port);
-        private:
-
-            std::unique_ptr<Socket> _socket;
+    public:
+        // TODO: commentare
+        static std::unique_ptr<Response> request(const std::string hostname, const std::string port);
+        static std::unique_ptr<Response> getResponse(std::string request, std::unique_ptr<Socket> socket);
     };
 
 } // namespace gemini

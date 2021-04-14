@@ -15,23 +15,47 @@
  ****************************************************************************/
 
 #include "TslSocket.hpp"
-#include "TslConnection.hpp"
 #include "Utils.hpp"
 
-#include <iostream>
-
 #include <errno.h>
-#include <unistd.h>
-#include <string.h>
-#include <resolv.h>
+#include <iostream>
+#include <exception>
 #include <netdb.h>
+#include <resolv.h>
+#include <stdexcept>
+#include <string.h>
+#include <unistd.h>
 #include <openssl/err.h>
+
 
 // ~~~~~ ~~~~~ ~~~~~
 // Implementation
 // ~~~~~ ~~~~~ ~~~~~
 
-gemini::TslSocket::TslSocket() {
+gemini::TslSocket::TslSocket(const std::string hostname, const std::string port) {
+    initCert();
+    connect(hostname, port);
+}
+
+
+gemini::TslSocket::~TslSocket() {
+    SSL_free(_ssl);
+    close(_sfd);
+}
+
+int gemini::TslSocket::send(const std::string request) {
+    return SSL_write(_ssl, request.c_str(), request.length());
+}
+
+int gemini::TslSocket::read(char * buffer, int maxLength) {
+    if (buffer == nullptr) {
+        throw std::invalid_argument("Invalid buffer");
+    }
+    return SSL_read(_ssl, buffer, maxLength);
+}
+
+
+void gemini::TslSocket::initCert() {
     const SSL_METHOD * method = TLS_client_method();
     SSL_CTX * ctx = SSL_CTX_new(method);
     if ( ctx == nullptr ) {
@@ -39,32 +63,31 @@ gemini::TslSocket::TslSocket() {
         ERR_print_errors_fp(stderr);
     }
 
-    ssl = SSL_new(ctx);
-    if ( ssl == nullptr ) {
+    _ssl = SSL_new(ctx);
+    if ( _ssl == nullptr ) {
         SSL_CTX_free(ctx);
         throw std::runtime_error("SSL_new() failed");
     }
     SSL_CTX_free(ctx);
 }
 
-gemini::TslSocket::~TslSocket() {
-    SSL_free(ssl);
-}
 
-
-std::unique_ptr<gemini::Connection> gemini::TslSocket::getConnection(const std::string hostname, const std::string port) {
-    const int sfd = openConnection(hostname, port);
-    SSL_set_fd(ssl, sfd);
-    const int status = SSL_connect(ssl);
+void gemini::TslSocket::connect(const std::string hostname, const std::string port) {
+    _sfd = openConnection(hostname, port);
+    SSL_set_fd(_ssl, _sfd);
+    const int status = SSL_connect(_ssl);
     if ( status != 1 ) {
         // TODO: throw exception
-        SSL_get_error(ssl, status);
+        SSL_get_error(_ssl, status);
         ERR_print_errors_fp(stderr); //High probability this doesn't do anything
         std::cerr << "SSL_connect failed with SSL_get_error code " << status << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    std::cout << "Connected with " << SSL_get_cipher(ssl) << " encryption" << std::endl;
-    displayCerts(ssl);
-    return std::unique_ptr<gemini::Connection>(new TslConnection(ssl, sfd));
+    printCerts();
+}
+
+void gemini::TslSocket::printCerts() {
+    std::cout << "Connected with " << SSL_get_cipher(_ssl) << " encryption" << std::endl;
+    displayCerts(_ssl);
 }

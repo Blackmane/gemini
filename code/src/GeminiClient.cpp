@@ -17,7 +17,6 @@
 #include "Protocol.hpp"
 #include "Exception.hpp"
 #include "GeminiClient.hpp"
-#include "TslConnection.hpp"
 #include "TslSocket.hpp"
 
 #include "Utils.hpp"
@@ -31,40 +30,13 @@
 #include <netdb.h>
 #include <openssl/err.h>
 
+
+
+
 // ~~~~~ ~~~~~ ~~~~~
 // Implementation
 // ~~~~~ ~~~~~ ~~~~~
-
-gemini::GeminiClient::GeminiClient(std::unique_ptr<Socket> socket) : _socket(std::move(socket)) {
-    
-}
-
-
-gemini::GeminiClient::~GeminiClient() {
-    
-}
-
-
-std::unique_ptr<gemini::GeminiClient> gemini::GeminiClient::getGeminiClient() {
-    return std::unique_ptr<GeminiClient>(
-                new GeminiClient(std::unique_ptr<Socket>(new TslSocket())                )
-            );
-}
-
-
-gemini::Response gemini::GeminiClient::request(const std::string url, const std::string port) {
-    // Check url
-    if (url.length() > 1024) {
-        throw std::invalid_argument("Invalid url length: expected max 1024");
-    }
-    // open connection
-    const std::string hostname = getHostnameFromUrl(url);
-    auto connection = _socket->getConnection(hostname, port);
-    if (connection == nullptr) {
-        throw connection_error("Error in connection to " + hostname + ":" + port);
-    }
-    // Build request
-    std::string request(url + gemini::CR + gemini::LF); // <URL><CR><LF> 
+std::unique_ptr<gemini::Response> gemini::GeminiClient::getResponse(std::string request, std::unique_ptr<Socket> connection) {
     // Send request
     auto sendRes = connection->send(request);
     if (sendRes <= 0) {
@@ -86,9 +58,9 @@ gemini::Response gemini::GeminiClient::request(const std::string url, const std:
     if ( statusBuffer[2] != ' ' ) {
         throw protocol_response_error("Invalid status response");
     }
-    Response response;
-    response.statusCodeFirst = statusBuffer[0] - '0';
-    response.statusCodeSecond = statusBuffer[1] - '0';
+    std::unique_ptr<Response> response(new Response);
+    response->statusCodeFirst = statusBuffer[0] - '0';
+    response->statusCodeSecond = statusBuffer[1] - '0';
 
     // Read <META><CR><FL>
     const auto metaSize = response::HEADER_META_SIZE + 2;
@@ -109,25 +81,44 @@ gemini::Response gemini::GeminiClient::request(const std::string url, const std:
         throw protocol_response_error("Invalid meta size");
     }
     // Save meta
-    response.meta = std::string(metaBuffer, pos);
+    response->meta = std::string(metaBuffer, pos);
 
     // Read <BODY>
-    if (response.statusCodeFirst == response::HEADER_STATUS_FIRST::SUCCESS) {
+    if (response->statusCodeFirst == response::HEADER_STATUS_FIRST::SUCCESS) {
         const auto bodyChunkSize = response::BODY_CHUNK_SIZE;
         char bodyBuffer[bodyChunkSize + 1];
         // Copy previous part
         if (pos+2 < metaBuffer + metaRes) {
-           response.body += std::string(pos+2, metaBuffer + metaRes); 
-            std::cout<< "OK<" << response.body << ">" << std::endl;
+            response->body += std::string(pos+2, metaBuffer + metaRes); 
+            std::cout<< "OK<" << response->body << ">" << std::endl;
         }
         auto bodyRes = connection->read(bodyBuffer, bodyChunkSize);
         while (bodyRes > 0) {
             // Set string terminator
             bodyBuffer[(size_t)bodyRes > bodyChunkSize ? bodyChunkSize : bodyRes] = '\0';
-            response.body += std::string(bodyBuffer);
+            response->body += std::string(bodyBuffer);
             bodyRes = connection->read(bodyBuffer, bodyChunkSize);
         }
     }
 
-    return response;
+    return std::move(response);
+}
+
+
+std::unique_ptr<gemini::Response> gemini::GeminiClient::request(const std::string url, const std::string port) {
+
+    // Check url
+    if (url.length() > 1024) {
+        throw std::invalid_argument("Invalid url length: expected max 1024");
+    }
+
+    // Open socket
+    const std::string hostname = getHostnameFromUrl(url);
+    std::unique_ptr<Socket> socket = std::unique_ptr<Socket>(new TslSocket(hostname, port) );
+
+    // Build request
+    std::string request(url + gemini::CR + gemini::LF); // <URL><CR><LF> 
+std::cout << request << std::endl;
+
+    return getResponse(request, std::move(socket));
 }

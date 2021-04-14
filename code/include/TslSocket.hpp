@@ -18,11 +18,9 @@
 #define GEMINI_TSLSOCKET
 
 #include "Socket.hpp"
-#include "Connection.hpp"
 
-#include <memory>
-#include <openssl/ssl.h>
 #include <string>
+#include <openssl/ssl.h>
 
 /**
  * @brief gemini projects
@@ -31,12 +29,19 @@ namespace gemini {
 
     class TslSocket : public Socket {
         public:
-            TslSocket();
+            TslSocket(const std::string hostname, const std::string port);
             ~TslSocket();
-            virtual std::unique_ptr<Connection> getConnection(const std::string hostname, const std::string port);
+            
+            virtual int send(const std::string request);
+            virtual int read(char * buffer, int maxLength);
 
         private:
-            SSL * ssl = nullptr;
+            void initCert();
+            void connect(const std::string hostname, const std::string port);
+            void printCerts();
+
+            SSL * _ssl = nullptr;
+            int _sfd;
     };
 
 } // namespace gemini

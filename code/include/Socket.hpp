@@ -20,10 +20,6 @@
 #ifndef GEMINI_SOCKET
 #define GEMINI_SOCKET
 
-#include "Connection.hpp"
-
-#include <memory>
-#include <openssl/ssl.h>
 #include <string>
 
 /**
@@ -33,9 +29,10 @@ namespace gemini {
 
     class Socket {
         public:
-            Socket();
-            ~Socket();
-            virtual std::unique_ptr<Connection> getConnection(const std::string hostname, const std::string port);
+            Socket() {};
+            ~Socket() {};
+            virtual int send(const std::string request) { return 0; };
+            virtual int read(char * buffer, int maxLength) { return 0; };
     };
 
 } // namespace gemini

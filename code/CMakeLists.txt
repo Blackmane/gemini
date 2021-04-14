@@ -8,8 +8,6 @@ set(GEMINI_HEADER_LIST
     "${gemini_SOURCE_DIR}/code/include/Protocol.hpp"
     "${gemini_SOURCE_DIR}/code/include/GeminiClient.hpp"
     "${gemini_SOURCE_DIR}/code/include/Exception.hpp"
-    "${gemini_SOURCE_DIR}/code/include/Connection.hpp"
-    "${gemini_SOURCE_DIR}/code/include/TslConnection.hpp"
     "${gemini_SOURCE_DIR}/code/include/Socket.hpp"
     "${gemini_SOURCE_DIR}/code/include/TslSocket.hpp"
     "${gemini_SOURCE_DIR}/code/include/Utils.hpp"
@@ -18,9 +16,6 @@ set(GEMINI_HEADER_LIST
 set(GEMINI_SRC_LIST 
     "${gemini_SOURCE_DIR}/code/src/Protocol.cpp"
     "${gemini_SOURCE_DIR}/code/src/GeminiClient.cpp"
-    "${gemini_SOURCE_DIR}/code/src/Connection.cpp"
-    "${gemini_SOURCE_DIR}/code/src/TslConnection.cpp"
-    "${gemini_SOURCE_DIR}/code/src/Socket.cpp"
     "${gemini_SOURCE_DIR}/code/src/TslSocket.cpp"
     "${gemini_SOURCE_DIR}/code/src/Utils.cpp"
     )

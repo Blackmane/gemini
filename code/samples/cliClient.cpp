@@ -29,10 +29,10 @@
 
 #define PrintResponse(response) \
     std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl; \
-    std::cout << "Response: " << response.statusCodeFirst << response.statusCodeSecond << " " << response.meta << std::endl; \
+    std::cout << "Response: " << response->statusCodeFirst << response->statusCodeSecond << " " << response->meta << std::endl; \
     std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl; \
-    if (response.body != "") { \
-        std::cout << response.body << std::endl; \
+    if (response->body != "") { \
+        std::cout << response->body << std::endl; \
         std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl; \
     }
 
@@ -47,11 +47,22 @@ int main(int argc, char const *argv[]) {
     std::string hostname = argv[1];
     std::string port = argv[2];
 
-    auto client = gemini::GeminiClient::getGeminiClient();
     try {
         PrintGetFROM(hostname, port)
-        auto response = client->request(hostname, port);
+        auto response = gemini::GeminiClient::request(hostname, port);
         PrintResponse(response)
+        while (response->statusCodeFirst == gemini::response::REDIRECT) {
+            std::string input;
+            std::cout << "\nRedirect to " << response->meta << "? (y/N)" << std::endl;
+            std::cin >> input;
+            if ( !( input[0] == 'y' || input[0] == 'Y' ) ) {
+                break;
+            }
+            std::cout << std::endl;
+            PrintGetFROM(response->meta, port)
+            response = gemini::GeminiClient::request(response->meta, port);
+            PrintResponse(response)
+        }
     } catch (std::exception &e) {
         std::cout << "Error: " << e.what() << std::endl;
     }
