@@ -36,14 +36,29 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 #    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-header-filter=include;-checks=*")
 
 # https://interrupt.memfault.com/blog/best-and-worst-gcc-clang-compiler-flags
-    add_compile_options(-Wall -Wextra -Wno-unused-parameter 
+    add_compile_options(
+        -Wall -Wextra -Wno-unused-parameter 
         -pedantic 
         -Wshadow -Wdouble-promotion
         -Wformat=2 -Wformat-truncation
         -ffunction-sections -fdata-sections
-        $<$<CONFIG:RELEASE>:-Werror> 
-        $<$<NOT:$<CONFIG:DEBUG>>:-O2> 
-        -g3 -fPIC)
+        -pie
+        "$<$<CONFIG:RELEASE>:-Werror;-g3;-O2>"
+        # $<$<NOT:$<CONFIG:DEBUG>>:-O2> 
+        "$<$<CONFIG:TSAN>:-fsanitize=thread;-g;-O1>"
+        "$<$<CONFIG:ASAN>:-fsanitize=address;-fno-optimize-sibling-calls;-fsanitize-address-use-after-scope;-fno-omit-frame-pointer;-g;-O1>"
+        "$<$<CONFIG:LSAN>:-fsanitize=leak;-fno-omit-frame-pointer;-g;-O1>"
+        # "$<$<CONFIG:MSAN>:-fsanitize=memory;-fno-optimize-sibling-calls;-fsanitize-memory-track-origins=2;-fno-omit-frame-pointer;-g;-O2>"
+        "$<$<CONFIG:UBSAN>:-fsanitize=undefined>"
+        -fPIC)
+
+    add_link_options(
+        $<$<CONFIG:TSAN>:-fsanitize=thread> 
+        $<$<CONFIG:ASAN>:-fsanitize=address>
+        $<$<CONFIG:TSAN>:-fsanitize=leak>
+        #$<$<CONFIG:MSAN>:-fsanitize=memory>
+        $<$<CONFIG:UBSAN>:-fsanitize=undefined> 
+        )
 
     set (CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
     
