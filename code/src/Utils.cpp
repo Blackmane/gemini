@@ -79,10 +79,10 @@ void gemini::displayCerts(SSL *ssl)  {
         std::cout << "Server certificates:" << std::endl;
         char *line = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
         std::cout << "Subject: " << line << std::endl;
-        delete line;
+        free(line);
         line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
         std::cout << "Issuer: " << line << std::endl;
-        delete line;
+        free(line);
         X509_free(cert);
     }
     else {
