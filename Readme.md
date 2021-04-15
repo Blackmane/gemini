@@ -48,8 +48,6 @@ cmake --build build_asan --target test
 
 ## Bug and todos
 
-* comment code;
-* review socket behaviour in multiple usage;
 * add continuous integration;
 * check memory leaks with asan;
 * run beautify.
