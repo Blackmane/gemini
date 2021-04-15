@@ -49,8 +49,7 @@ cmake --build build_asan --target test
 ## Bug and todos
 
 * add continuous integration;
-* check memory leaks with asan;
-* run beautify.
+* check memory leaks with asan.
 
 
 ## Acknowledgments 
