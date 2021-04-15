@@ -7,7 +7,7 @@
  * @bug
  * @todo
  *
- ****************************************************************************-
+ ****************************************************************************
  *
  *             _  _   o   __  __   __    _  o   _   ,_    _
  *            / |/ |  |  /   /    /  \_|/ \_|  |/  /  |  |/
@@ -22,11 +22,12 @@
 
 #include <iostream>
 
-#define PrintGetFROM(hostname, port)                                           \
+#define PrintGetFROM(hostname, port) {                                         \
   std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl;       \
-  std::cout << "Get from: " << hostname << " : " << port << std::endl;
+  std::cout << "Get from: " << hostname << " : " << port << std::endl;         \
+  }
 
-#define PrintResponse(response)                                                \
+#define PrintResponse(response) {                                              \
   std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl;       \
   std::cout << "Response: " << response->statusCodeFirst                       \
             << response->statusCodeSecond << " " << response->meta             \
@@ -35,7 +36,7 @@
   if (response->body != "") {                                                  \
     std::cout << response->body << std::endl;                                  \
     std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl;     \
-  }
+  }}
 
 int main(int argc, char const *argv[]) {
 
@@ -48,10 +49,10 @@ int main(int argc, char const *argv[]) {
   std::string port = argv[2];
 
   try {
-    PrintGetFROM(hostname, port) auto response =
-        gemini::GeminiClient::request(hostname, port);
-    PrintResponse(response) while (response->statusCodeFirst ==
-                                   gemini::response::REDIRECT) {
+    PrintGetFROM(hostname, port);
+    auto response = gemini::GeminiClient::request(hostname, port);
+    PrintResponse(response);
+    while (response->statusCodeFirst == gemini::response::REDIRECT) {
       std::string input;
       std::cout << "\nRedirect to " << response->meta << "? (y/N)" << std::endl;
       std::cin >> input;
@@ -59,9 +60,9 @@ int main(int argc, char const *argv[]) {
         break;
       }
       std::cout << std::endl;
-      PrintGetFROM(response->meta, port) response =
-          gemini::GeminiClient::request(response->meta, port);
-      PrintResponse(response)
+      PrintGetFROM(response->meta, port);
+      response = gemini::GeminiClient::request(response->meta, port);
+      PrintResponse(response);
     }
   } catch (std::exception &e) {
     std::cout << "Error: " << e.what() << std::endl;
