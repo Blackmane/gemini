@@ -90,7 +90,6 @@ std::unique_ptr<gemini::Response> gemini::GeminiClient::getResponse(std::string 
         // Copy previous part
         if (pos+2 < metaBuffer + metaRes) {
             response->body += std::string(pos+2, metaBuffer + metaRes); 
-            std::cout<< "OK<" << response->body << ">" << std::endl;
         }
         auto bodyRes = connection->read(bodyBuffer, bodyChunkSize);
         while (bodyRes > 0) {
@@ -116,9 +115,8 @@ std::unique_ptr<gemini::Response> gemini::GeminiClient::request(const std::strin
     const std::string hostname = getHostnameFromUrl(url);
     std::unique_ptr<Socket> socket = std::unique_ptr<Socket>(new TslSocket(hostname, port) );
 
-    // Build request
-    std::string request(url + gemini::CR + gemini::LF); // <URL><CR><LF> 
-std::cout << request << std::endl;
+    // Build request: <URL><CR><LF> 
+    std::string request(url + gemini::CR + gemini::LF);
 
     return getResponse(request, std::move(socket));
 }
