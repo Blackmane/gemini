@@ -22,21 +22,24 @@
 
 #include <iostream>
 
-#define PrintGetFROM(hostname, port) {                                         \
-  std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl;       \
-  std::cout << "Get from: " << hostname << " : " << port << std::endl;         \
+#define PrintGetFROM(hostname, port)                                           \
+  {                                                                            \
+    std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl;     \
+    std::cout << "Get from: " << hostname << " : " << port << std::endl;       \
   }
 
-#define PrintResponse(response) {                                              \
-  std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl;       \
-  std::cout << "Response: " << response->statusCodeFirst                       \
-            << response->statusCodeSecond << " " << response->meta             \
-            << std::endl;                                                      \
-  std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl;       \
-  if (response->body != "") {                                                  \
-    std::cout << response->body << std::endl;                                  \
+#define PrintResponse(response)                                                \
+  {                                                                            \
     std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl;     \
-  }}
+    std::cout << "Response: " << response->statusCodeFirst                     \
+              << response->statusCodeSecond << " " << response->meta           \
+              << std::endl;                                                    \
+    std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl;     \
+    if (response->body != "") {                                                \
+      std::cout << response->body << std::endl;                                \
+      std::cout << "----- ----- ----- ----- ----- ----- -----" << std::endl;   \
+    }                                                                          \
+  }
 
 int main(int argc, char const *argv[]) {
 
