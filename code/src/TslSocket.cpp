@@ -60,7 +60,6 @@ void gemini::TslSocket::initCert() {
     SSL_CTX * ctx = SSL_CTX_new(method);
     if ( ctx == nullptr ) {
         throw std::runtime_error("SSL_CTX() init failed");
-        ERR_print_errors_fp(stderr);
     }
 
     _ssl = SSL_new(ctx);
@@ -77,11 +76,9 @@ void gemini::TslSocket::connect(const std::string hostname, const std::string po
     SSL_set_fd(_ssl, _sfd);
     const int status = SSL_connect(_ssl);
     if ( status != 1 ) {
-        // TODO: throw exception
+        close(_sfd);
         SSL_get_error(_ssl, status);
-        ERR_print_errors_fp(stderr); //High probability this doesn't do anything
-        std::cerr << "SSL_connect failed with SSL_get_error code " << status << std::endl;
-        exit(EXIT_FAILURE);
+        throw std::runtime_error("SSL_connect failed with SSL_get_error code " + status);
     }
 
     printCerts();
