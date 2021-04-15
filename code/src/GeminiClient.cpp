@@ -101,7 +101,7 @@ gemini::GeminiClient::getResponse(std::string request,
     }
   }
 
-  return std::move(response);
+  return response;
 }
 
 std::unique_ptr<gemini::Response>
@@ -110,7 +110,7 @@ gemini::GeminiClient::request(const std::string url, const std::string port) {
   // Check url
   if (url.length() > request::URL_MAX_SIZE) {
     throw std::invalid_argument("Invalid url length: expected max " +
-                                request::URL_MAX_SIZE);
+                                std::to_string(request::URL_MAX_SIZE));
   }
 
   // Open socket

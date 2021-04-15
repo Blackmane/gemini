@@ -46,7 +46,7 @@ int gemini::openConnection(const std::string hostname, const std::string port) {
   }
 
   const int ERROR_STATUS = -1;
-  int sfd, err;
+  int sfd = 0, err = 0;
   for (struct addrinfo *addr = addrs; addr != nullptr; addr = addr->ai_next) {
     sfd = socket(addrs->ai_family, addrs->ai_socktype, addrs->ai_protocol);
     if (sfd == ERROR_STATUS) {
