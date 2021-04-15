@@ -26,12 +26,22 @@
  */
 namespace gemini {
 
+
+    /**
+     * @brief carriage return
+     */
     const char CR = (char) 13;
+    /**
+     * @brief line feed
+     */
     const char LF = (char) 10;
 
+
+/**
+ * @brief response protocol constants
+ */
 namespace response {
 
-    // const size_t URL_SIZE = 1024;
 
     const size_t HEADER_STATUS_SIZE = 2; // bytes
     const char HEADER_STATUS_FIRST_CHAR_MIN = '1';
@@ -43,6 +53,9 @@ namespace response {
     
     const size_t BODY_CHUNK_SIZE = 1024; // bytes
 
+    /**
+     * @brief possibles value of first status digit
+     */
     enum HEADER_STATUS_FIRST {
         INPUT = 1,
         SUCCESS = 2,
@@ -52,9 +65,20 @@ namespace response {
         CLIENT_CERTIFICATE_REQUIRED = 6
     };
 
+    /**
+     * @brief check value is a valid first status digit (1-6).
+     * @param value a char value.
+     * @return true if it is ok, false otherwise.
+     */
     bool isHeaderStatusFirstValid (const char value);
 
+    /**
+     * @brief check value is a valid second status digit (0-9).
+     * @param value a char value.
+     * @return true if it is ok, false otherwise.
+     */
     bool isHeaderStatusSecondValid (const char value);
+
 
 } // namespace response
 } // namespace gemini
