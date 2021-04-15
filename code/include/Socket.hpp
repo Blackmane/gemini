@@ -52,7 +52,7 @@ public:
    * @param maxLength max number of bytes to read. Usually size of buffer.
    * @return number of bytes read.
    */
-  virtual int read(char *buffer, int maxLength) { return 0; };
+  virtual size_t read(char *buffer, size_t maxLength) { return 0; };
 };
 
 } // namespace gemini

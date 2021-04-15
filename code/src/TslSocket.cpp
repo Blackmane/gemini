@@ -46,7 +46,7 @@ int gemini::TslSocket::send(const std::string request) {
   return SSL_write(_ssl, request.c_str(), request.length());
 }
 
-int gemini::TslSocket::read(char *buffer, int maxLength) {
+size_t gemini::TslSocket::read(char *buffer, size_t maxLength) {
   if (buffer == nullptr) {
     throw std::invalid_argument("Invalid buffer");
   }

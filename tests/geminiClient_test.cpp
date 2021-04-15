@@ -49,7 +49,7 @@ public:
         return request.length();
     }
 
-    virtual int read(char * buffer, int maxLength) {
+    virtual size_t read(char * buffer, size_t maxLength) {
         if (buffer == nullptr) {
             throw std::invalid_argument("Invalid buffer");
         }
@@ -118,7 +118,7 @@ TEST_CASE( "Test stubs", "[socket/connection stub]" ) {
         read = socket.read((char *) buffer, 10);
         allRead += read;
         REQUIRE (allRead == data.length());
-        for (auto i = 0; i < read; i++) {
+        for (auto i = 0u; i < read; i++) {
             REQUIRE (buffer[i] == data[allRead - read + i]);
         }
         // All already read
