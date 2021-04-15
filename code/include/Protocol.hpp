@@ -38,6 +38,18 @@ namespace gemini {
 
 
 /**
+ * @brief request protocol constants
+ */
+namespace request {
+
+
+    const size_t URL_MAX_SIZE = 1024;
+
+
+} // namespace request
+
+
+/**
  * @brief response protocol constants
  */
 namespace response {
